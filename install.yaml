@@ -1,0 +1,70 @@
+# ddev-codex - OpenAI Codex CLI addon for DDEV
+# https://github.com/ddev/ddev-codex
+
+name: codex
+
+# Require DDEV v1.24.10+ for proper addon support
+ddev_version_constraint: '>= v1.24.10'
+
+# Files copied to the project's .ddev directory
+project_files:
+  - config.codex.yaml
+  - web-build/Dockerfile.codex
+  - commands/web/codex
+  - codex/
+
+# No global files needed
+global_files: []
+
+# No dependencies on other addons
+dependencies: []
+
+pre_install_actions:
+  # Ensure we're on a supported architecture
+  - |
+    #ddev-description:Check for supported architecture (x86_64 or arm64)
+    ARCH=$(uname -m)
+    if [ "$ARCH" != "x86_64" ] && [ "$ARCH" != "aarch64" ] && [ "$ARCH" != "arm64" ]; then
+      echo "Unsupported architecture: $ARCH. Codex CLI requires x86_64 or arm64."
+      exit 1
+    fi
+
+post_install_actions:
+  - |
+    #ddev-description:Create .gitignore for codex credentials
+    if [ ! -f "${DDEV_APPROOT}/.ddev/codex/.gitignore" ]; then
+      echo "*" > "${DDEV_APPROOT}/.ddev/codex/.gitignore"
+      echo "!.gitignore" >> "${DDEV_APPROOT}/.ddev/codex/.gitignore"
+    fi
+  - |
+    #ddev-description:Set correct permissions for codex command
+    chmod +x "${DDEV_APPROOT}/.ddev/commands/web/codex"
+  - |
+    #ddev-description:Display post-install instructions
+    echo ""
+    echo "=============================================="
+    echo "  OpenAI Codex CLI addon installed!"
+    echo "=============================================="
+    echo ""
+    echo "Run 'ddev restart' to build the container with Codex CLI."
+    echo ""
+    echo "After restart, authenticate using one of these methods:"
+    echo ""
+    echo "  1. API Key (recommended for automation):"
+    echo "     Add OPENAI_API_KEY to .ddev/.env or .ddev/config.codex.yaml"
+    echo ""
+    echo "  2. ChatGPT Login (device auth for headless):"
+    echo "     ddev codex login --device-auth"
+    echo ""
+    echo "Then run: ddev codex"
+    echo ""
+
+removal_actions:
+  - |
+    #ddev-description:Clean up codex configuration
+    if [ -d "${DDEV_APPROOT}/.ddev/codex" ]; then
+      echo "Note: Codex credentials in .ddev/codex/ were preserved."
+      echo "Remove manually if no longer needed: rm -rf .ddev/codex/"
+    fi
+
+yaml_read_files: []

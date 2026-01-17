@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#ddev-generated
+## Description: Run OpenAI Codex CLI
+## Usage: codex [args]
+## Example: "ddev codex" or "ddev codex --help" or "ddev codex login --device-auth"
+
+# Ensure the codex config directory exists and is linked
+if [ ! -d "$HOME/.codex" ] && [ -d "/home/.codex" ]; then
+    ln -sf /home/.codex "$HOME/.codex"
+fi
+
+# Check if codex is installed
+if ! command -v codex &> /dev/null; then
+    echo "Error: Codex CLI is not installed."
+    echo "Please run 'ddev restart' to rebuild the container."
+    exit 1
+fi
+
+# Run codex with all passed arguments
+exec codex "$@"

@@ -1,0 +1,23 @@
+#ddev-generated
+# Configuration for OpenAI Codex CLI addon
+# Documentation: https://github.com/ddev/ddev-codex
+
+# Uncomment and set your OpenAI API key here, or use .ddev/.env
+# web_environment:
+#   - OPENAI_API_KEY=sk-your-api-key-here
+
+# Mount the codex directory for credential persistence
+bind_mounts:
+  - source: .ddev/codex
+    target: /home/.codex
+    read_only: false
+
+hooks:
+  post-start:
+    - exec: |
+        # Ensure codex config directory has correct permissions
+        mkdir -p /home/.codex
+        # Link to expected location if needed
+        if [ ! -L "$HOME/.codex" ] && [ ! -d "$HOME/.codex" ]; then
+          ln -sf /home/.codex "$HOME/.codex"
+        fi

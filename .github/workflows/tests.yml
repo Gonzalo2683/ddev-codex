@@ -1,0 +1,71 @@
+name: tests
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate set "debug_enabled: true"'
+        required: false
+        default: false
+
+defaults:
+  run:
+    shell: bash
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    strategy:
+      matrix:
+        ddev_version:
+          - stable
+        os:
+          - ubuntu-latest
+          # - windows-latest  # Uncomment when Windows support is ready
+      fail-fast: false
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Environment setup
+        run: |
+          brew install ddev/ddev/ddev
+          ddev config global --instrumentation-opt-in=false --omit-containers=ddev-router
+
+      - name: Start DDEV
+        run: |
+          ddev poweroff
+          ddev config --project-type=php --docroot=. --create-docroot
+          ddev start
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+
+      - name: Install Bats
+        run: brew install bats-core
+
+      - name: Run tests
+        run: bats tests
+
+      - name: Clean up
+        if: always()
+        run: ddev poweroff
