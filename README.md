@@ -1,6 +1,6 @@
 # ddev-codex
 
-[![tests](https://github.com/ddev/ddev-codex/actions/workflows/tests.yml/badge.svg)](https://github.com/ddev/ddev-codex/actions/workflows/tests.yml)
+[![tests](https://github.com/Gonzalo2683/ddev-codex/actions/workflows/tests.yml/badge.svg)](https://github.com/Gonzalo2683/ddev-codex/actions/workflows/tests.yml)
 ![project is maintained](https://img.shields.io/maintenance/yes/2025.svg)
 
 **OpenAI Codex CLI addon for DDEV** - Run the OpenAI Codex coding agent directly inside your DDEV containers.
@@ -10,40 +10,41 @@
 ## Installation
 
 ```bash
-ddev add-on get ddev/ddev-codex
+ddev add-on get Gonzalo2683/ddev-codex
 ddev restart
 ```
 
 ## Authentication
 
-Codex supports two authentication methods:
+### ChatGPT Login (Device Auth) - Recommended
 
-### Option 1: API Key (Recommended for automation)
+Since Codex runs inside a container, the standard browser authentication won't work (the callback redirects to `localhost` which doesn't resolve inside the container). Use **device authentication** instead:
 
-Add your OpenAI API key to `.ddev/.env`:
+**Step 1:** Enable device code authorization in ChatGPT settings
 
-```bash
-OPENAI_API_KEY=sk-your-api-key-here
-```
+Go to [ChatGPT Settings > Security](https://chatgpt.com/settings) and enable **"Enable device code authorization for Codex"**.
 
-Or uncomment and set it in `.ddev/config.codex.yaml`:
-
-```yaml
-web_environment:
-  - OPENAI_API_KEY=sk-your-api-key-here
-```
-
-### Option 2: ChatGPT Login (Device Auth)
-
-For headless environments like containers, use device authentication:
+**Step 2:** Run the login command
 
 ```bash
 ddev codex login --device-auth
 ```
 
-This will display a URL and code. Open the URL in your browser, sign in with your ChatGPT account, and enter the code.
+**Step 3:** Complete authentication
 
-**Note:** Your credentials are stored in `.ddev/codex/` and persist across `ddev restart`.
+The command will display a URL and a code. Open the URL in your browser, sign in with your ChatGPT account, and enter the provided code.
+
+Your credentials are stored in `.ddev/codex/` and persist across `ddev restart`.
+
+### API Key (Alternative)
+
+If you prefer using an API key, add it to `.ddev/.env`:
+
+```bash
+OPENAI_API_KEY=sk-your-api-key-here
+```
+
+Then restart: `ddev restart`
 
 ## Usage
 
@@ -54,10 +55,7 @@ ddev codex
 # Get help
 ddev codex --help
 
-# Login with device auth
-ddev codex login --device-auth
-
-# Run a specific command
+# Run a specific prompt
 ddev codex "explain this code"
 ```
 
@@ -71,27 +69,7 @@ Edit `.ddev/web-build/Dockerfile.codex` and change the version:
 ARG CODEX_VERSION=0.87.0
 ```
 
-Then rebuild with:
-
-```bash
-ddev restart
-```
-
-### Environment Variables
-
-Codex respects these environment variables:
-
-| Variable | Description |
-|----------|-------------|
-| `OPENAI_API_KEY` | Your OpenAI API key |
-| `CODEX_HOME` | Custom config directory (default: `~/.codex`) |
-
-## Credential Persistence
-
-Credentials are stored in `.ddev/codex/` which is:
-- Mounted as `~/.codex` inside the container
-- Automatically gitignored (credentials are not committed)
-- Persisted across `ddev restart` and `ddev stop/start`
+Then rebuild: `ddev restart`
 
 ## Troubleshooting
 
@@ -99,11 +77,13 @@ Credentials are stored in `.ddev/codex/` which is:
 
 Run `ddev restart` to rebuild the container with Codex CLI installed.
 
-### Authentication issues
+### Authentication callback error
 
-1. Check if credentials exist: `ddev exec ls -la ~/.codex/`
-2. Re-authenticate: `ddev codex login --device-auth`
-3. For API key issues, verify the key in `.ddev/.env`
+If you see a `localhost` callback URL that doesn't work, you're using the wrong auth method. Use `ddev codex login --device-auth` instead.
+
+### Device auth not working
+
+Make sure you've enabled **"Enable device code authorization for Codex"** in [ChatGPT Settings > Security](https://chatgpt.com/settings).
 
 ### Architecture not supported
 
@@ -117,4 +97,4 @@ Contributions are welcome! Please open an issue or pull request.
 
 Apache License 2.0. See [LICENSE](LICENSE) for details.
 
-**Maintained by the DDEV community.**
+**Maintained by [@Gonzalo2683](https://github.com/Gonzalo2683)**
