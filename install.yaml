@@ -67,4 +67,5 @@ removal_actions:
       echo "Remove manually if no longer needed: rm -rf .ddev/codex/"
     fi
 
-yaml_read_files: []
+yaml_read_files:
+  # No additional YAML files needed
