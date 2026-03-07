@@ -6,18 +6,19 @@
 # web_environment:
 #   - OPENAI_API_KEY=sk-your-api-key-here
 
-# Mount the codex directory for credential persistence
-bind_mounts:
-  - source: .ddev/codex
-    target: /home/.codex
-    read_only: false
-
 hooks:
   post-start:
     - exec: |
-        # Ensure codex config directory has correct permissions
-        mkdir -p /home/.codex
-        # Link to expected location if needed
-        if [ ! -L "$HOME/.codex" ] && [ ! -d "$HOME/.codex" ]; then
-          ln -sf /home/.codex "$HOME/.codex"
+        # Ensure the persistent mount point exists and has correct permissions
+        mkdir -p /mnt/codex-config
+        chmod 755 /mnt/codex-config
+        # Remove any stale symlink or empty directory, then create symlink
+        if [ -L "$HOME/.codex" ]; then
+          rm -f "$HOME/.codex"
+        elif [ -d "$HOME/.codex" ] && [ -z "$(ls -A "$HOME/.codex" 2>/dev/null)" ]; then
+          rmdir "$HOME/.codex"
+        fi
+        # Create symlink from ~/.codex -> /mnt/codex-config (the persistent bind mount)
+        if [ ! -e "$HOME/.codex" ]; then
+          ln -sf /mnt/codex-config "$HOME/.codex"
         fi

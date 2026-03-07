@@ -5,9 +5,9 @@
 ## Usage: codex [args]
 ## Example: "ddev codex" or "ddev codex --help" or "ddev codex login --device-auth"
 
-# Ensure the codex config directory exists and is linked
-if [ ! -d "$HOME/.codex" ] && [ -d "/home/.codex" ]; then
-    ln -sf /home/.codex "$HOME/.codex"
+# Ensure the codex config directory is linked to persistent mount
+if [ ! -e "$HOME/.codex" ] && [ -d "/mnt/codex-config" ]; then
+    ln -sf /mnt/codex-config "$HOME/.codex"
 fi
 
 # Check if codex is installed

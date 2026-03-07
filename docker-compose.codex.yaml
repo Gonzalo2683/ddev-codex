@@ -1,0 +1,9 @@
+#ddev-generated
+# Docker Compose override for Codex CLI credential persistence
+# This mounts .ddev/codex into the web container so credentials
+# survive ddev restart.
+
+services:
+  web:
+    volumes:
+      - ./codex:/mnt/codex-config

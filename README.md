@@ -22,7 +22,7 @@ Since Codex runs inside a container, the standard browser authentication won't w
 
 **Step 1:** Enable device code authorization in ChatGPT settings
 
-Go to [ChatGPT Settings > Security](https://chatgpt.com/settings) and enable **"Enable device code authorization for Codex"**.
+Go to [ChatGPT Settings > Security](https://chatgpt.com/settings#settings) and enable **"Enable device code authorization for Codex"**.
 
 **Step 2:** Run the login command
 

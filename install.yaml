@@ -9,6 +9,7 @@ ddev_version_constraint: '>= v1.24.10'
 # Files copied to the project's .ddev directory
 project_files:
   - config.codex.yaml
+  - docker-compose.codex.yaml
   - web-build/Dockerfile.codex
   - commands/web/codex
   - codex/
