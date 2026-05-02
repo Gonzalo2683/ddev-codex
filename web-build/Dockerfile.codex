@@ -3,8 +3,8 @@
 # Documentation: https://github.com/ddev/ddev-codex
 
 # Codex CLI version - change this to update the version
-# Options: specific version (e.g., 0.87.0), or use "latest" to always get the newest
-ARG CODEX_VERSION=0.87.0
+# Options: specific version (e.g., 0.87.0), or "latest" to always get the newest
+ARG CODEX_VERSION=latest
 
 # Detect architecture and download appropriate binary
 RUN set -eux; \
@@ -21,8 +21,17 @@ RUN set -eux; \
             exit 1 \
             ;; \
     esac; \
+    # Resolve "latest" to actual version number via GitHub API
+    if [ "${CODEX_VERSION}" = "latest" ]; then \
+        RESOLVED_VERSION=$(curl -fsSL "https://api.github.com/repos/openai/codex/releases/latest" \
+            | grep '"tag_name"' \
+            | sed 's/.*"tag_name": *"rust-v\([^"]*\)".*/\1/'); \
+    else \
+        RESOLVED_VERSION="${CODEX_VERSION}"; \
+    fi; \
+    echo "Installing Codex CLI version: ${RESOLVED_VERSION}"; \
     # Download and install Codex CLI
-    curl -fsSL "https://github.com/openai/codex/releases/download/rust-v${CODEX_VERSION}/codex-${CODEX_ARCH}.tar.gz" \
+    curl -fsSL "https://github.com/openai/codex/releases/download/rust-v${RESOLVED_VERSION}/codex-${CODEX_ARCH}.tar.gz" \
         -o /tmp/codex.tar.gz; \
     tar -xzf /tmp/codex.tar.gz -C /tmp; \
     # Find and install the binary (name includes architecture)
