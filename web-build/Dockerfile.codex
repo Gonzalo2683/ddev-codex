@@ -33,7 +33,8 @@ RUN set -eux; \
     # Download and install Codex CLI
     curl -fsSL "https://github.com/openai/codex/releases/download/rust-v${RESOLVED_VERSION}/codex-${CODEX_ARCH}.tar.gz" \
         -o /tmp/codex.tar.gz; \
-    tar -xzf /tmp/codex.tar.gz -C /tmp; \    # Find and install the binary (name includes architecture)
+    tar -xzf /tmp/codex.tar.gz -C /tmp; \
+    # Find and install the binary (name includes architecture)
     find /tmp -name "codex-*" -type f -executable -exec mv {} /usr/local/bin/codex \; 2>/dev/null || \
     find /tmp -name "codex*" -type f ! -name "*.tar.gz" -exec chmod +x {} \; -exec mv {} /usr/local/bin/codex \;; \
     # Cleanup
