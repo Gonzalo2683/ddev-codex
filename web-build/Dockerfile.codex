@@ -6,6 +6,13 @@
 # Options: specific version (e.g., 0.87.0), or use "latest" to always get the newest
 ARG CODEX_VERSION=0.87.0
 
+# Install bubblewrap, the Linux sandboxing prerequisite for the Codex CLI.
+# https://developers.openai.com/codex/concepts/sandboxing#prerequisites
+RUN apt-get update \
+      && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends bubblewrap \
+      && apt-get clean \
+      && rm -rf /var/lib/apt/lists/*
+
 # Detect architecture and download appropriate binary
 RUN set -eux; \
     ARCH=$(uname -m); \
